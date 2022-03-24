@@ -12,25 +12,10 @@
 
 #include "fdf.h"
 
-void	clean_arr(char **arr)
+char	**get_arr(int fd, unsigned int i)
 {
-	int i;
-
-	i = 0;
-	while (arr && arr[i])
-	{
-		free(arr[i]);
-		i++;
-	}
-	if (arr)
-		free(arr);
-	return ;
-}
-
-char **get_arr(int fd, unsigned int i)
-{
-	char **arr;
-	char *str;
+	char	**arr;
+	char	*str;
 
 	arr = 0;
 	str = get_next_line(fd);
@@ -40,30 +25,6 @@ char **get_arr(int fd, unsigned int i)
 		arr = malloc(sizeof(arr) * (i + 1));
 	arr[i] = str;
 	return (arr);
-}
-
-int	ft_arrlen(char **arr)
-{
-	int	i;
-
-	i = 0;
-	while (arr && arr[i])
-		i++;
-	return (i);
-}
-
-void clean_map(char ***map)
-{
-	int	i;
-
-	i = 0;
-	while (map && map[i])
-	{
-		clean_arr(map[i]);
-		i++;
-	}
-	if (map)
-		free(map);
 }
 
 char	***get_map(char **arr)
@@ -81,29 +42,82 @@ char	***get_map(char **arr)
 		size--;
 		map[size] = ft_split(arr[size], ' ');
 	}
-	return(map);
+	return (map);
 }
 
-int main(int argc, char const *argv[])
+short	check_str(char *str)
+{
+	int		i;
+
+	i = 0;
+	if (ft_strlen(str) > 11 && (lg_at(str) > INT_MAX || lg_at(str) < INT_MIN))
+		return (1);
+	while (str[i] != 0 && str[i] != '\n' && str[i] != ',')
+	{
+		if ((str[i] == '-' && i != 0) || (!ft_isdigit(str[i]) && str[i] != '-')
+			|| (i == 0 && str[i] == '\n'))
+			return (1);
+		i++;
+	}
+	if (str[i] == 0 || str[i] == '\n')
+		return (0);
+	if ((str[i] == ',' && ft_strlen(&str[i]) <= 3 && str[i + 1] != '0'
+			&& str[i + 2] != 'x') || i == 0 || i > 11)
+		return (1);
+	if (str[i] == ',')
+		i += 3;
+	while (str[i] && (ft_isdigit(str[i]) || (str[i] >= 65 && str[i] <= 70)
+			|| (str[i] >= 97 && str[i] <= 102)))
+		i++;
+	if (str[i] != 0 && str[i] != '\n')
+		return (1);
+	return (0);
+}
+
+short	check_map(char ***map)
+{
+	int	i;
+	int	j;
+	int	sz;
+
+	i = 0;
+	sz = 0;
+	while (map[i])
+	{
+		j = 0;
+		while (map[i][j])
+		{
+			if (check_str(map[i][j]))
+				sz = -1;
+			j++;
+		}
+		if (sz && j != sz && write(2, "Map error\n", 10))
+			return (0);
+		sz = j;
+		i++;
+	}
+	return (1);
+}
+
+int	main(int argc, char const *argv[])
 {
 	int		fd;
 	char	**arr;
-	char	***map;
+	t_data	img;
 
 	fd = -1;
 	arr = 0;
-	map = 0;
+	img.map = 0;
 	if (argc == 2)
 		fd = open(argv[1], O_RDONLY);
 	if (fd > 0)
 		arr = get_arr(fd, 0);
 	if (arr)
-		map = get_map(arr);
+		img.map = get_map(arr);
 	clean_arr(arr);
-	if (map)
-		ft_draw(map, (char *)argv[1]);
-	clean_map(map);
 	close(fd);
+	if (img.map && check_map(img.map))
+		ft_draw(&img, (char *)argv[1]);
+	clean_map(img.map);
 	return (0);
 }
-
