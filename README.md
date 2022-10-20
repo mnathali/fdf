@@ -4,7 +4,7 @@
 
 Fdf is the first graphical project. The program paints pixel by pixel image of 3D map by x,y,z coordinates.
 
-![alt text](http://url/to/img.png)
+![alt text](https://github.com/mnathali/fdf/blob/main/Fdf_maps.jpg)
 
 ## Compilling and launch
 
