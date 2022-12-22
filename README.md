@@ -14,7 +14,9 @@ The project uses [minilibx](https://harm-smits.github.io/42docs/libs/minilibx.ht
 
 So, before compiling the project you have to clone MLX library inside the project's directory and create it:
 
-```git clone https://github.com/42Paris/minilibx-linux.git && ./mlx_linux/configure```
+```bash
+git clone https://github.com/42Paris/minilibx-linux.git mlx_linux && ./mlx_linux/configure
+```
 
 As MLX library is clonned use ```make``` command to compile executable with name ```fdf```. There is also ```make bonus``` rule to create executable that has additional functions like zooming of image using wheel of mouse and shifting of image using arrows on your keyboard.
 
